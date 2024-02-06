@@ -21,6 +21,47 @@ export async function transactionsRoutes(app: FastifyInstance){
       transactions,
     };
   });
+
+  app.get('/summary', {
+    preHandler: checkSessionIdExists,
+  }, async (request) => {
+
+    const { sessionId } = request.cookies;
+
+    const summary = await knex('transactions')
+      .sum('amount', { as: 'amount' })
+      .where({ session_id: sessionId })
+      .first();
+
+    return {
+      summary,
+    };
+
+  });
+
+  app.get('/:id', {
+    preHandler: checkSessionIdExists,
+  }, async (request) => {
+
+    const getTransactionParamsSchema = z.object({
+      id: z.string().uuid(),
+    });
+
+    const { id } = getTransactionParamsSchema.parse(request.params);
+    const { sessionId } = request.cookies;
+
+    const transaction = await knex('transactions')
+      .where({ 
+        id,
+        session_id: sessionId,
+      })
+      .first();
+
+      return {
+        transaction,
+      };
+
+  });
   
   app.post('/', async (request, reply) => {
     
