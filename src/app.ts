@@ -1,10 +1,12 @@
 import fastify from "fastify";
 import cookie from  "@fastify/cookie";
+import { transactionsRoutes } from "./routes/transactions";
 
 export const app = fastify();
 
 app.register(cookie);
-
-app.get("/", async () => {
-  return 'Test ok'
+app.register(transactionsRoutes, {
+  prefix: 'transactions',
 });
+
+
